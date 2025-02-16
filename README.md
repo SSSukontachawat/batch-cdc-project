@@ -64,7 +64,7 @@ Visit http://localhost:8080 to access the Airflow UI and monitor the pipeline ex
 ### etl_spark.py  
 This script handles the Extract, Transform, and Load (ETL) process:  
   
-It reads CSV files for sales transactions.  
+It reads CSV files for daily sales transactions.  
 It transforms the data by calculating the total price of sales.  
 It writes the cleaned data to a PostgreSQL database, ensuring the schema matches the database schema.  
   
