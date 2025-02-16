@@ -5,7 +5,7 @@ import subprocess
 
 def run_pyspark_etl():
     """Function to trigger the PySpark ETL script."""
-    subprocess.run(["spark-submit", "/path/to/etl_spark.py"], check=True)
+    subprocess.run(["spark-submit", "/path/to/etl_spark.py"], check=True) # Edit your path to etl_spark.py
 
 # Default arguments for DAG
 default_args = {
