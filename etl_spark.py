@@ -7,18 +7,18 @@ from datetime import datetime
 # Initialize Spark session
 spark = SparkSession.builder \
     .appName("SalesDataETL") \
-    .config("spark.jars", "/home/dataengineer/jars/postgresql-42.5.6.jar") \
+    .config("spark.jars", "/path/to/jars/postgresql-42.x.x.jar") \
     .getOrCreate()
 
 # Database connection properties
-DB_URL = "jdbc:postgresql://127.0.0.1:5432/firstproject"
+DB_URL = "jdbc:postgresql://<localhost>:5432/<database name>"
 DB_PROPERTIES = {
-    "user": "myuser",
-    "password": "mypassword",
+    "user": "<username>",
+    "password": "<password>",
     "driver": "org.postgresql.Driver"
 }
 
-DATA_DIR = "firstDataPipeline/data"
+DATA_DIR = "<path/to/data>"
 
 # Function to get the latest modified file in a subdirectory
 def get_latest_file(folder, subfolder, prefix):
