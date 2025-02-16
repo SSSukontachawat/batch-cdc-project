@@ -1,8 +1,8 @@
-# batch-cdc-project
-Batch-based Change Data Capture (CDC) pipeline for sales data processing.  
+# Daily Batch Incremental Load
+Automated daily ingestion of sales transaction files into a database.  
   
 Project Structure:  
-batch-cdc-project/  
+batch-incremental-load-project/  
 │  
 ├── etl_spark.py               # PySpark ETL script to process sales data  
 ├── etl_spark_dag.py           # Airflow DAG to schedule and run the ETL process  
@@ -25,8 +25,8 @@ batch-cdc-project/
 Clone the repository and navigate to your project directory.  
 
 ```bash  
-git clone https://github.com/yourusername/batch-cdc-project.git  
-cd batch-cdc-project  
+git clone https://github.com/yourusername/batch-incremental-load.git  
+cd batch-incremental-load  
 ```  
 
 Install the required Python libraries:  
