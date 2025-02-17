@@ -1,89 +1,123 @@
-# Daily Batch Incremental Load
-Automated daily ingestion of sales transaction files into a database.  
-  
-Project Structure:  
-batch-incremental-load-project/  
-│  
-├── etl_spark.py               # PySpark ETL script to process sales data  
-├── etl_spark_dag.py           # Airflow DAG to schedule and run the ETL process  
-├── README.md                  # Project documentation  
-└── requirements.txt           # Python dependencies for the project  
-  
-## Prerequisites  
-  
-- Apache Spark 3.x  
-- Python 3.x  
-- Apache Airflow 2.x  
-- PostgreSQL Database  
-- PostgreSQL JDBC Driver (`postgresql-42.x.x.jar`)  
-- Required Python Libraries listed in `requirements.txt`  
+# Change Data Capture (CDC) with Airflow, PySpark, and PostgreSQL
 
-## Setup Instructions  
+## 📌 Project Overview
 
-### 1. Install Dependencies  
+This project implements a Change Data Capture (CDC) pipeline using Apache Airflow, PySpark, and PostgreSQL to track and process sales transaction changes efficiently.
 
-Clone the repository and navigate to your project directory.  
+### 🚀 Features
 
-```bash  
-git clone https://github.com/yourusername/batch-incremental-load.git  
-cd batch-incremental-load  
-```  
+- Daily Batch Processing (10 PM):
 
-Install the required Python libraries:  
-```pip install -r requirements.txt```    
-Note: These requirements are listed for use in my future project. Please refer to my project again later.  
-  
-### 2. Configure PostgreSQL  
-Make sure your PostgreSQL instance is running and accessible. Update the following variables in etl_spark.py:  
-  
+- Detects and processes the latest sales transaction file (sales_YYYYMMDD.csv).
+
+- Appends new transactions to the database.
+
+- Hourly Incremental Processing:
+
+- Detects modifications (inserts, updates, and deletes) from the last hour.
+
+- Applies the changes to maintain data consistency.
+
+### 📁 Data Flow
+
+- Sales transactions are stored as daily CSV files (sales_YYYYMMDD.csv).
+
+- Airflow DAGs trigger the PySpark ETL process at scheduled times.
+
+#### PySpark ETL:
+
+- Reads the sales data.
+
+- Cleans and transforms the data.
+
+- Compares with existing data in PostgreSQL.
+
+- Inserts new records, updates modified records, and deletes removed records.
+
+### 🛠️ Technologies Used
+
+- Apache Airflow - Workflow scheduling & orchestration.
+
+- Apache Spark (PySpark) - Distributed data processing.
+
+- PostgreSQL - Database for storing processed sales data.
+
+- Python - ETL script development.
+
+- Bash & Linux - Environment setup and automation.
+
+### 📂 Project Structure
 ```
-DB_URL: Connection string for your PostgreSQL database.  
-DB_PROPERTIES: Username and password for your PostgreSQL instance.  
-DATA_DIR: Path to the directory containing your daily CSV data.  
+firstDataPipeline/  
+│── dags/  
+│   ├── etl_spark_dag.py        # Airflow DAG for scheduling ETL jobs  
+│── data/  
+│   ├── sales_YYYYMMDD.csv      # Daily sales transaction files  
+│── etl_spark.py                # PySpark ETL script  
+│── README.md                   # Project documentation  
 ```
-    
-### 3. Set Up PySpark Script  
-In etl_spark.py, make sure the spark.jars configuration points to the correct location of the PostgreSQL JDBC driver JAR file.  
-  
-### 4. Configure Airflow DAG  
-Ensure Airflow is installed and running. If you're using Docker, refer to the official Airflow Docker documentation. 
-Update the etl_spark_dag.py with the correct path to your etl_spark.py file in the subprocess.run() command.  
+### ⚡ How It Works
 
-```subprocess.run(["spark-submit", "/path/to/etl_spark.py"], check=True) # Edit your path to etl_spark.py ```  
-  
-### 5. Scheduling the ETL Task  
-The DAG in etl_spark_dag.py is set to run at 10:00 PM UTC every day (schedule_interval="0 22 * * *"). You can modify the schedule as needed.  
-  
-### 6. Run the ETL Process  
-You can manually trigger the DAG from the Airflow UI or let it run according to the schedule.  
-```airflow webserver --port 8080```  
-```airflow scheduler```  
-Visit http://localhost:8080 to access the Airflow UI and monitor the pipeline execution.  
-  
-## File Descriptions  
-### etl_spark.py  
-This script handles the Extract, Transform, and Load (ETL) process:  
-  
-It reads CSV files for daily sales transactions.  
-It transforms the data by calculating the total price of sales.  
-It writes the cleaned data to a PostgreSQL database, ensuring the schema matches the database schema.  
-  
-### etl_spark_dag.py  
-This Airflow DAG orchestrates the ETL process:  
-  
-It triggers the etl_spark.py script using a PythonOperator.  
-The ETL process is scheduled to run daily at a specified time.  
-Run the Project
-Start Airflow and ensure the DAG is listed in the UI.
-Trigger the DAG either manually or let it run on the defined schedule.
+#### 1️⃣ Batch Processing (Daily at 10 PM)
 
-## Notes
-Ensure your PostgreSQL instance is accessible and the required tables are already created.
-The data source (CSV files) should be updated daily for the ETL process to run successfully.
-Airflow is used to orchestrate and schedule the process, ensuring scalability and automation.
-  
-## License
-MIT License  
-  
-## Credit:  
-Design by owner, Compiled by Chat-gpt  
+- Runs etl_spark.py to load new sales transactions.
+
+- Appends records to the PostgreSQL database.
+
+#### 2️⃣ Incremental Processing (Every Hour)
+
+- Detects modifications in the last hour.
+
+- Updates or deletes records accordingly.
+
+### 🚀 Setup & Installation
+
+#### 1️⃣ Install Dependencies
+
+Ensure the following are installed:
+```
+sudo apt update && sudo apt install postgresql postgresql-contrib -y
+pip install pyspark psycopg2 airflow
+```
+#### 2️⃣ Configure Airflow
+
+Set up Airflow and initialize the database:
+```
+export AIRFLOW_HOME=~/airflow
+airflow db init
+```
+#### 3️⃣ Start Airflow Services
+```
+airflow webserver -p 8080 &
+airflow scheduler &
+```
+#### 4️⃣ Add Airflow DAGs
+
+Place etl_spark_dag.py inside dags/ and restart Airflow:
+```
+airflow dags list
+```
+### 📊 Example DAG Tasks
+
+#### Run ETL for the latest file (daily at 10 PM):
+```
+airflow tasks trigger Sales_Transactions_DAG_for_pyspark run_pyspark_etl_daily
+````
+#### Run incremental processing (every hour):
+```
+airflow tasks trigger Sales_Transactions_DAG_for_pyspark run_pyspark_etl_hourly
+```
+### 🎯 Future Improvements
+
+- Implement real-time CDC using Kafka.
+
+- Optimize PostgreSQL queries for large datasets.
+
+- Add logging and monitoring for ETL jobs.
+
+### 📌 Author
+
+Aspiring Data Engineer | Building projects to showcase my skills in Big Data & ETL Processing.
+
+### Credit
+Design ETL by owner / Clean and Compile by Chat-gpt
