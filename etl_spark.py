@@ -20,7 +20,7 @@ DB_PROPERTIES = {
 
 DATA_DIR = "<directory/path>"    # Locate your .csv path
 
-# Function to get the file based on the condition: today or modified in the last 24 hours
+# Function to get the file based on the condition: today or modified in the last 1 hour
 def get_file(folder, subfolder, prefix, check_modified):
     folder_path = os.path.join(folder, subfolder)
     if not os.path.exists(folder_path):
@@ -41,18 +41,18 @@ def get_file(folder, subfolder, prefix, check_modified):
             return None
         return latest_file
 
-    # If check_modified is True, get all files modified within the last 24 hours
+    # If check_modified is True, get all files modified within the last 1 hour
     else:
         files = [f for f in os.listdir(folder_path) if f.startswith(prefix)]
         modified_files = []
         for file in files:
             file_path = os.path.join(folder_path, file)
             file_mod_time = os.path.getmtime(file_path)
-            if file_mod_time >= (today_date - timedelta(days=1)).timestamp():
+            if file_mod_time >= (today_date - timedelta(hours=1)).timestamp():
                 modified_files.append(file_path)
-        print(f"Files modified in the last 24 hours: {sorted(modified_files)}")
+        print(f"Files modified in the last 1 hour: {sorted(modified_files)}")
         if not modified_files:
-            print(f"No files were modified in the last 24 hours. Skipping...")
+            print(f"No files were modified in the last 1 hour. Skipping...")
             return None
         return sorted(modified_files)
 
